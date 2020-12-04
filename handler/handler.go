@@ -28,7 +28,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		defer file.Close()
 
 		//创建文件
-		newFile, err := os.Create("D:\\goWork\\static\\log\\" + header.Filename)
+		newFile, err := os.Create("./static/log/" + header.Filename)
 		if err != nil {
 			fmt.Printf("Failed to create file, err : %s", err.Error())
 			return
