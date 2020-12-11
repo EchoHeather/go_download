@@ -2,10 +2,13 @@ package handler
 
 import (
 	"fmt"
+	"goWork/meta"
+	"goWork/util"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 )
 
 //UploadHandler 处理上传文件
@@ -20,15 +23,22 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, string(data))
 	} else if r.Method == "POST" {
 		//接收文件流及存储到本地目录
-		file, header, err := r.FormFile("file")
+		file, head, err := r.FormFile("file")
 		if err != nil {
 			fmt.Printf("Faield to get data, err : %s", err.Error())
 			return
 		}
 		defer file.Close()
 
+		//定义结构体
+		fileMeta := meta.Filemeta{
+			FileName: head.Filename,
+			Location: "./static/log/" + head.Filename,
+			UploadAt: time.Now().Format("2006-01-02 15:04:05"),
+		}
+
 		//创建文件
-		newFile, err := os.Create("./static/log/" + header.Filename)
+		newFile, err := os.Create(fileMeta.Location)
 		if err != nil {
 			fmt.Printf("Failed to create file, err : %s", err.Error())
 			return
@@ -36,11 +46,18 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		defer newFile.Close()
 
 		//copy源文件内容存入新文件内
-		_, err = io.Copy(newFile, file)
+		fileMeta.FileSize, err = io.Copy(newFile, file)
 		if err != nil {
 			fmt.Printf("Failed to save data into file, err : %s", err.Error())
 			return
 		}
+
+		//copy文件指针会回到末尾，获取文件sha1应从头部获取
+		newFile.Seek(0, 0)
+		fileMeta.FileSha1 = util.FileSha1(newFile)
+		//存储到tree内
+		meta.UpdateFileMeta(fileMeta)
+
 		http.Redirect(w, r, "/file/upload/suc", http.StatusFound)
 	}
 }
