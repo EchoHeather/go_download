@@ -12,8 +12,9 @@ func main() {
 		http.StripPrefix("/static/",
 			http.FileServer(http.Dir("./static"))))
 	//路由
-	http.HandleFunc("/file/upload", handler.UploadHandler)
-	http.HandleFunc("/file/upload/suc", handler.UploadSucHandler)
+	http.HandleFunc("/file/upload", handler.UploadHandler)  //根目录
+	http.HandleFunc("/file/upload/suc", handler.UploadSucHandler)  //上传成功
+	http.HandleFunc("/file/meta", handler.GetFileMetaHandler) //获取元文件信息
 
 	//监听端口
 	err := http.ListenAndServe(":8080", nil)
