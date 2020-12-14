@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -32,7 +33,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		defer file.Close()
 
 		//定义结构体
-		fileMeta := meta.Filemeta{
+		fileMeta := meta.FileMeta{
 			FileName: head.Filename,
 			Location: "./static/log/" + head.Filename,
 			UploadAt: time.Now().Format("2006-01-02 15:04:05"),
@@ -74,7 +75,20 @@ func GetFileMetaHandler(w http.ResponseWriter, r *http.Request) {
 	filehash := r.Form["filehash"][0]
 	fMeta := meta.GetFileMeta(filehash)
 	data, err := json.Marshal(fMeta)
-	if err != nil{
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
+}
+
+//FileQueryHandler 查询批量获取元文件
+func FileQueryHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	limitCnt, _ := strconv.Atoi(r.Form.Get("limit"))
+	fileMetas := meta.GetLastFileMetas(limitCnt)
+	data, err := json.Marshal(fileMetas)
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
