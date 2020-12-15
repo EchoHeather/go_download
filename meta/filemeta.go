@@ -28,6 +28,11 @@ func GetFileMeta(filesha1 string) FileMeta {
 	return fileMetas[filesha1]
 }
 
+//DeleteFileMeta 删除tree内指定的Filemeta
+func RemoveFileMeta(filesha1 string) {
+	delete(fileMetas, filesha1)
+}
+
 //GetLastFileMetas 获取批量的文件元信息列表
 func GetLastFileMetas(count int) []FileMeta {
 	var fMetaArray []FileMeta

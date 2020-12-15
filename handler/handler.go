@@ -115,3 +115,42 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", "attachment;filename=\""+fm.FileName+"\"")
 	w.Write(data)
 }
+
+//FileMetaUpdateHandler 更新元信息(重命名)
+func FileMetaUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	opType := r.Form.Get("op")
+	filesha1 := r.Form.Get("filehash")
+	newFileName := r.Form.Get("filename")
+
+	if opType != "0" {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	fileMeta := meta.GetFileMeta(filesha1)
+	fileMeta.FileName = newFileName
+	meta.UpdateFileMeta(fileMeta)
+	data, err := json.Marshal(fileMeta)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+}
+
+//FileMetaDeleteHandler 删除元文件
+func FileDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	filesha1 := r.Form.Get("filehash")
+	fileMeta := meta.GetFileMeta(filesha1)
+	os.Remove(fileMeta.Location)
+	meta.RemoveFileMeta(filesha1)
+	w.WriteHeader(http.StatusOK)
+}
