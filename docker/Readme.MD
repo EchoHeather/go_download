@@ -3,7 +3,7 @@
 #####master节点
 ```
 mkdir -p /data/mysql/datam
-docker run -d --name mysql-master -p 3306:3306 -v master.conf:/etc/mysql/mysql.conf.d/mysqld.cnf -v /data/mysql/datam:/var/lib/mysql  -e MYSQL_ROOT_PASSWORD=123456 mysql:5.7
+docker run -d --name mysql-master -p 3306:3306 -v master.conf:/etc/mysql/mysql.conf.d/mysqld.cnf -v /data/mysql/datam:/var/lib/mysql  -e MYSQL_ROOT_PASSWORD=root mysql:5.7
 
 #####运行参数说明
 
@@ -11,20 +11,17 @@ docker run -d --name mysql-master -p 3306:3306 -v master.conf:/etc/mysql/mysql.c
 
 -p 3306:3306: 将host的13306端口映射到容器的3306端口
 
-
 -v master.conf:/etc/mysql/mysql.conf.d/mysqld.cnf ： master.conf配置文件挂载
-
 
 -v /data/mysql/datam:/var/lib/mysql ： mysql容器内数据挂载到host的/data/mysql/datam， 用于持久化
 
-
--e MYSQL_ROOT_PASSWORD=123456 : mysql的root登录密码为123456
+-e MYSQL_ROOT_PASSWORD=root : mysql的root登录密码为root
 ```
 
 #####slave节点
 ```
 mkdir  -p /data/mysql/datas
-docker run -d --name mysql-slave -p 3307:3306 -v slave.conf:/etc/mysql/mysql.conf.d/mysqld.cnf -v /data/mysql/datas:/var/lib/mysql  -e MYSQL_ROOT_PASSWORD=123456 mysql:5.7
+docker run -d --name mysql-slave -p 3307:3306 -v slave.conf:/etc/mysql/mysql.conf.d/mysqld.cnf -v /data/mysql/datas:/var/lib/mysql  -e MYSQL_ROOT_PASSWORD=root mysql:5.7
 
 #####运行参数说明
 
@@ -36,7 +33,7 @@ docker run -d --name mysql-slave -p 3307:3306 -v slave.conf:/etc/mysql/mysql.con
 
 -v /data/mysql/datas:/var/lib/mysql ： mysql容器内数据挂载到host的/data/mysql/datas， 用于持久化
 
--e MYSQL_ROOT_PASSWORD=123456 : mysql的root登录密码为123456
+-e MYSQL_ROOT_PASSWORD=root : mysql的root登录密码为root
 ```
 
 #####登陆master节点
