@@ -14,10 +14,10 @@ func main() {
 	http.HandleFunc("/file/upload/suc", handler.UploadSucHandler) //上传成功
 	http.HandleFunc("/file/meta", handler.GetFileMetaHandler)     //获取元文件信息
 	http.HandleFunc("/file/query", handler.FileQueryHandler)      //批量获取元文件信息
+	http.HandleFunc("/file/download", handler.DownloadHandler)    //下载元文件
 
 	//监听端口
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
+	if err := http.ListenAndServe(":8080", nil); err != nil {
 		fmt.Printf("Failed to start server, err : %s", err.Error())
 	}
 }
