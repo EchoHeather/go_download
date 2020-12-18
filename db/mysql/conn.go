@@ -11,7 +11,7 @@ var db *sql.DB
 
 //init mysql初始化
 func init() {
-	db, _ := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/fileserver?charset=uft8")
+	db, _ = sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/fileserver?charset=utf8")
 	db.SetMaxOpenConns(1000)
 	err := db.Ping()
 	if err != nil {

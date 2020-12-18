@@ -1,6 +1,9 @@
 package meta
 
-import "sort"
+import (
+	mydb "goWork/db"
+	"sort"
+)
 
 //FileMeta 文件元信息结构
 type FileMeta struct {
@@ -21,6 +24,10 @@ func init() {
 //UpdateFileMeta 更新到tree上
 func UpdateFileMeta(fmeta FileMeta) {
 	fileMetas[fmeta.FileSha1] = fmeta
+}
+
+func UpdateFileMetaDB(fmeta FileMeta) bool {
+	return mydb.OnFileUploadFinished(fmeta.FileSha1, fmeta.FileName, fmeta.FileSize, fmeta.Location)
 }
 
 //GetFileMeta 获取tree内指定的Filemeta
