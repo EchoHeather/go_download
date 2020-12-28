@@ -35,6 +35,21 @@ func GetFileMeta(filesha1 string) FileMeta {
 	return fileMetas[filesha1]
 }
 
+//GetFileMetaDB 从mysql获取元信息
+func GetFileMetaDB(filesha1 string) (FileMeta, error) {
+	tfile, err := mydb.GetFileMeta(filesha1)
+	if err != nil {
+		return FileMeta{}, err
+	}
+	fmeta := FileMeta{
+		FileSha1: tfile.FileHash,
+		FileName: tfile.FileName.String,
+		FileSize: tfile.FileSize.Int64,
+		Location: tfile.FileAddr.String,
+	}
+	return fmeta, nil
+}
+
 //DeleteFileMeta 删除tree内指定的Filemeta
 func RemoveFileMeta(filesha1 string) {
 	delete(fileMetas, filesha1)

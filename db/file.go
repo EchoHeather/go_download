@@ -1,6 +1,7 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
 	mydb "goWork/db/mysql"
 )
@@ -28,4 +29,29 @@ func OnFileUploadFinished(filehash string, filename string, filesize int64, file
 		return true
 	}
 	return false
+}
+
+//TableFile 获取数据库字段值
+type TableFile struct {
+	FileHash string
+	FileName sql.NullString
+	FileSize sql.NullInt64
+	FileAddr sql.NullString
+}
+
+//GetFileMeta 从mysql获取文件元信息
+func GetFileMeta(filehash string) (*TableFile, error) {
+	stmt, err := mydb.DBConn().Prepare("select file_sha1,file_name,file_size,file_addr from tbl_file where file_sha1 = ? and status = 1 limit 1;")
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	defer stmt.Close()
+	tfile := TableFile{}
+	err = stmt.QueryRow(filehash).Scan(&tfile.FileHash, &tfile.FileName, &tfile.FileSize, &tfile.FileAddr)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	return &tfile, nil
 }
