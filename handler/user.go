@@ -37,3 +37,19 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("FAILED"))
 	return
 }
+
+func SignInHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		//获取账号密码
+		r.ParseForm()
+		username := r.Form.Get("username")
+		password := r.Form.Get("password")
+		encPassWd := util.Sha1([]byte(password + pwd_salt))
+
+		//验证账号密码
+		dblayer.UserSignIn(username, encPassWd)
+
+		//登陆成功并跳转
+
+	}
+}

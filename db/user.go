@@ -25,3 +25,33 @@ func UserSignup(username, password string) bool {
 	}
 	return false
 }
+
+//UserSignIn 判断密码是否一致
+func UserSignIn(username, password string) bool {
+	stmt, err := mydb.DBConn().Prepare("select * from tbl_user where user_name = ? limit 1")
+	if err != nil {
+		fmt.Println("Failed to select , err :" + err.Error())
+		return false
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(username)
+
+	if err != nil {
+		fmt.Println("Failed to select , err :" + err.Error())
+		return false
+	} else if rows == nil {
+		fmt.Println("username not found")
+		return false
+	}
+
+	pRows := mydb.ParseRows(rows)
+	if len(pRows) > 0 && string(pRows[0]["user_pwd"].([]byte)) == password{
+		return true
+	}
+	return false
+}
+
+func PrepareRows() {
+
+}

@@ -18,6 +18,7 @@ func main() {
 	http.HandleFunc("/file/update", handler.FileMetaUpdateHandler) //更新元文件信息
 	http.HandleFunc("/file/delete", handler.FileDeleteHandler)     //删除元文件
 	http.HandleFunc("/user/signup", handler.SignupHandler)         //用户注册
+	http.HandleFunc("/user/signin", handler.SignInHandler)         //用户登陆
 
 	//监听端口
 	if err := http.ListenAndServe(":8080", nil); err != nil {
