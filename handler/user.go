@@ -40,6 +40,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+//SignInHandler 用户登陆
 func SignInHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		//获取账号密码
