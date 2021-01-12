@@ -68,3 +68,49 @@ func UpdateToken(username, token string) bool {
 	}
 	return true
 }
+
+//GetToken 获取用户登录token
+func GetToken(username string) (string, error) {
+	stmt, err := mydb.DBConn().Prepare("select user_token from tbl_user_token where user_name = ? limit 1")
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+	defer stmt.Close()
+	var token string
+	err = stmt.QueryRow(username).Scan(&token)
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+	return token, nil
+}
+
+type User struct {
+	Username   string
+	Email      string
+	Phone      string
+	SignupAt   string
+	LastActive string
+	Status     int
+}
+
+//GetUserInfo 获取用户信息
+func GetUserInfo(username string) (User, error) {
+	user := User{}
+
+	stmt, err := mydb.DBConn().Prepare("select user_name, signup_at from tbl_user where user_name = ? limit 1")
+	if err != nil {
+		fmt.Println(err.Error())
+		return user, err
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRow(username).Scan(&user.Username, &user.SignupAt)
+	if err != nil {
+		fmt.Println(err.Error())
+		return user, err
+	}
+
+	return user, nil
+}

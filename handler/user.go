@@ -87,3 +87,52 @@ func GenToken(username string) string {
 	tokenPrefix := util.MD5([]byte(username + ts + "_tokensalt"))
 	return tokenPrefix + ts[:8]
 }
+
+//UserInfoHandler 获取用户信息
+func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	username := r.Form.Get("username")
+	token := r.Form.Get("token")
+	isValidToken := IsTokenValid(username, token)
+	if !isValidToken {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+	user, err := dblayer.GetUserInfo(username)
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+	resp := util.RespMsg{
+		Code: 0,
+		Msg:  "ok",
+		Data: user,
+	}
+	w.Write(resp.JSONBytes())
+}
+
+//IsTokenValid 验证token
+func IsTokenValid(username, token string) bool {
+	//判断长度
+	if len(token) != 40 {
+		fmt.Println("token invalid: " + token)
+		return false
+	}
+	//判断token后8位的时间Hex2Dec
+	t := token[32:40]
+	if util.Hex2Dec(t) < time.Now().Unix()-86400 {
+		fmt.Println("token time out: " + token)
+		return false
+	}
+
+	//判断数据库token是否一致
+	tokenDb, err := dblayer.GetToken(username)
+	if err != nil {
+		fmt.Println("token invalid: " + err.Error())
+		return false
+	}
+	if token != tokenDb {
+		return false
+	}
+	return true
+}
