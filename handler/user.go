@@ -78,7 +78,15 @@ func SignInHandler(w http.ResponseWriter, r *http.Request) {
 			},
 		}
 		w.Write(resp.JSONBytes())
+		return
 	}
+	data, err := ioutil.ReadFile("static/view/signin.html")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(data)
+	return
 }
 
 //GenToken 获取token 40位字符md5(username + timestamp + token_salt) + timestamp[:8]
@@ -92,12 +100,13 @@ func GenToken(username string) string {
 func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	username := r.Form.Get("username")
-	token := r.Form.Get("token")
-	isValidToken := IsTokenValid(username, token)
-	if !isValidToken {
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
+	//验证token是否有效
+	//token := r.Form.Get("token")
+	//isValidToken := IsTokenValid(username, token)
+	//if !isValidToken {
+	//	w.WriteHeader(http.StatusForbidden)
+	//	return
+	//}
 	user, err := dblayer.GetUserInfo(username)
 	if err != nil {
 		w.WriteHeader(http.StatusForbidden)

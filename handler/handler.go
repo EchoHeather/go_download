@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	dblayer "goWork/db"
 	"goWork/meta"
 	"goWork/util"
 	"io"
@@ -57,10 +58,20 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		//copy文件指针会回到末尾，获取文件sha1应从头部获取
 		newFile.Seek(0, 0)
 		fileMeta.FileSha1 = util.FileSha1(newFile)
+
 		//存储到tree内 => 存入mysql
 		//meta.UpdateFileMeta(fileMeta)
 		_ = meta.UpdateFileMetaDB(fileMeta)
-		http.Redirect(w, r, "/file/upload/suc", http.StatusFound)
+
+		//更新用户文件表记录
+		r.ParseForm()
+		username := r.Form.Get("username")
+		sunc := dblayer.OnUserFileUploadFinished(username, fileMeta.FileSha1, fileMeta.FileName, fileMeta.FileSize)
+		if sunc {
+			http.Redirect(w, r, "/static/view/home.html", http.StatusFound)
+		} else {
+			w.Write([]byte("Upload Filed."))
+		}
 	}
 }
 
