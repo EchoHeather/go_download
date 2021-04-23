@@ -102,7 +102,14 @@ func GetFileMetaHandler(w http.ResponseWriter, r *http.Request) {
 func FileQueryHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	limitCnt, _ := strconv.Atoi(r.Form.Get("limit"))
-	fileMetas := meta.GetLastFileMetas(limitCnt)
+	username := r.Form.Get("username")
+	//fileMetas := meta.GetLastFileMetas(limitCnt)
+	fileMetas, err := dblayer.QueryUserFileMetas(username, limitCnt)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	data, err := json.Marshal(fileMetas)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

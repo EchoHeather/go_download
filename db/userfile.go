@@ -1,18 +1,19 @@
 package db
 
 import (
+	"fmt"
 	mydb "goWork/db/mysql"
 	"time"
 )
 
 //UserFile 用户文件表结构体
 type UserFile struct {
-	UserName   string
-	FileHash   string
-	FileName   string
-	FileSize   int64
-	UploadAt   string
-	LastUpdate string
+	UserName    string
+	FileHash    string
+	FileName    string
+	FileSize    int64
+	UploadAt    string
+	LastUpdated string
 }
 
 //OnUserFileUploadFinished 更新用户文件表
@@ -29,5 +30,26 @@ func OnUserFileUploadFinished(username, filehash, filename string, filesize int6
 		return false
 	}
 	return true
+}
 
+//QueryUserFileMetas 批量获取用户文件信息
+func QueryUserFileMetas(username string, limit int) ([]UserFile, error) {
+	stmt, err := mydb.DBConn().Prepare("select file_sha1,file_name,file_size,upload_at,last_update from tbl_user_file where user_name=? limit ?")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(username, limit)
+	var userFiles []UserFile
+	for rows.Next() {
+		ufile := UserFile{}
+		err := rows.Scan(&ufile.FileHash, &ufile.FileName, &ufile.FileSize, &ufile.UploadAt, &ufile.LastUpdated)
+		if err != nil {
+			fmt.Println(err.Error())
+			break
+		}
+		userFiles = append(userFiles, ufile)
+	}
+	return userFiles, nil
 }
