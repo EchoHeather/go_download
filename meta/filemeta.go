@@ -36,9 +36,9 @@ func GetFileMeta(filesha1 string) FileMeta {
 }
 
 //GetFileMetaDB 从mysql获取元信息
-func GetFileMetaDB(filesha1 string) (FileMeta, error) {
-	tfile, err := mydb.GetFileMeta(filesha1)
-	if err != nil {
+func GetFileMetaDB(fileSha1 string) (FileMeta, error) {
+	tfile, err := mydb.GetFileMeta(fileSha1)
+	if err != nil || tfile == nil { // 增加tfile为nil的判断
 		return FileMeta{}, err
 	}
 	fmeta := FileMeta{
