@@ -21,6 +21,7 @@ func main() {
 	http.HandleFunc("/user/signin", handler.SignInHandler)                                     //用户登陆
 	http.HandleFunc("/user/info", handler.HTTPinterceptor(handler.UserInfoHandler))            //用户信息
 	http.HandleFunc("/file/fastupload", handler.HTTPinterceptor(handler.TryFastUploadHandler)) //秒传接口
+	http.HandleFunc("/file/aaa", handler.InitialMultipartUploadHandler)                        //初始化分块上传
 
 	//监听端口
 	if err := http.ListenAndServe(":8080", nil); err != nil {
