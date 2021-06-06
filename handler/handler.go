@@ -178,6 +178,7 @@ func FileDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+//TryFastUploadHandler 文件秒传
 func TryFastUploadHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	//获取参数
