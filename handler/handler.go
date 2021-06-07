@@ -5,6 +5,7 @@ import (
 	"fmt"
 	dblayer "goWork/db"
 	"goWork/meta"
+	"goWork/store/oss"
 	"goWork/util"
 	"io"
 	"io/ioutil"
@@ -58,9 +59,18 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		//copy文件指针会回到末尾，获取文件sha1应从头部获取
 		newFile.Seek(0, 0)
 		fileMeta.FileSha1 = util.FileSha1(newFile)
+		newFile.Seek(0, 0) // 游标重新回到文件头部
+
+		//存入oss
+		ossPath := "oss/" + fileMeta.FileSha1 + "/" + head.Filename
+		err = oss.Bucket().PutObject(ossPath, newFile)
+		if err != nil {
+			w.Write([]byte("Failed to save oss! err :" + err.Error()))
+			return
+		}
+		fileMeta.Location = ossPath
 
 		//存储到tree内 => 存入mysql
-		//meta.UpdateFileMeta(fileMeta)
 		_ = meta.UpdateFileMetaDB(fileMeta)
 
 		//更新用户文件表记录
@@ -222,4 +232,17 @@ func TryFastUploadHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(resp.JSONBytes())
 		return
 	}
+}
+
+func DownloadUrlHandler(w http.ResponseWriter, r *http.Request) {
+	//获取参数
+	r.ParseForm()
+	filehash := r.Form.Get("filehash")
+	//获取文件信息
+	data, _ := dblayer.GetFileMeta(filehash)
+	//获取下载地址
+	url := oss.DownloadUrl(data.FileAddr)
+
+	w.Write([]byte(url))
+	return
 }

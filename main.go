@@ -25,6 +25,7 @@ func main() {
 	http.HandleFunc("/file/mpupload/uppart", handler.HTTPinterceptor(handler.UploadPartHandler))           //分块上传文件
 	http.HandleFunc("/file/mpupload/complete", handler.HTTPinterceptor(handler.CompleteUploadHandler))     //文件分块上传状态
 	http.HandleFunc("/file/mpupload/cancel", handler.HTTPinterceptor(handler.CancelUploadHandler))         //取消文件上传
+	http.HandleFunc("/file/downloadurl", handler.HTTPinterceptor(handler.DownloadUrlHandler))              //文件下载
 
 	//监听端口
 	if err := http.ListenAndServe(":8080", nil); err != nil {

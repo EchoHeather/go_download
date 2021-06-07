@@ -3,3 +3,4 @@
 go get "github.com/go-sql-driver/mysql"
 go get "github.com/garyburd/redigo/redis"
 go get "github.com/json-iterator/go"
+go get "github.com/aliyun/aliyun-oss-go-sdk"
