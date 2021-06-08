@@ -241,7 +241,7 @@ func DownloadUrlHandler(w http.ResponseWriter, r *http.Request) {
 	//获取文件信息
 	data, _ := dblayer.GetFileMeta(filehash)
 	//获取下载地址
-	url := oss.DownloadUrl(data.FileAddr)
+	url := oss.DownloadUrl(data.FileAddr.String)
 
 	w.Write([]byte(url))
 	return
