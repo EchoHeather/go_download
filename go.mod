@@ -8,4 +8,5 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.8+incompatible
 	github.com/garyburd/redigo v1.6.2
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
+	github.com/streadway/amqp v1.0.0
 )
