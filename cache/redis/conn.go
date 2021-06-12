@@ -3,13 +3,14 @@ package redis
 import (
 	"fmt"
 	"github.com/garyburd/redigo/redis"
+	cfg "goWork/config"
 	"time"
 )
 
 var (
 	pool      *redis.Pool
-	redisHost = "127.0.0.1:6379"
-	redisPass = "testupload"
+	redisHost = cfg.RedisHost
+	redisPass = cfg.RedisPass
 )
 
 //newRedisPool redis连接池

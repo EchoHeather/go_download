@@ -3,8 +3,11 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"goWork/common"
+	cfg "goWork/config"
 	dblayer "goWork/db"
 	"goWork/meta"
+	"goWork/mq"
 	"goWork/store/oss"
 	"goWork/util"
 	"io"
@@ -61,14 +64,31 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		fileMeta.FileSha1 = util.FileSha1(newFile)
 		newFile.Seek(0, 0) // 游标重新回到文件头部
 
-		//存入oss
 		ossPath := "oss/" + fileMeta.FileSha1 + "/" + head.Filename
-		err = oss.Bucket().PutObject(ossPath, newFile)
-		if err != nil {
-			w.Write([]byte("Failed to save oss! err :" + err.Error()))
-			return
+		/*
+			//存入oss 同步
+			ossPath := "oss/" + fileMeta.FileSha1 + "/" + head.Filename
+			err = oss.Bucket().PutObject(ossPath, newFile)
+			if err != nil {
+				w.Write([]byte("Failed to save oss! err :" + err.Error()))
+				return
+			}
+			fileMeta.Location = ossPath
+		*/
+
+		//异步
+		data := mq.TransferData{
+			FileHash:      fileMeta.FileSha1,
+			CurLocation:   fileMeta.Location,
+			DestLocation:  ossPath,
+			DestStoreType: common.StoreOSS,
 		}
-		fileMeta.Location = ossPath
+		pubData, _ := json.Marshal(data)
+		suc := mq.Publish(cfg.TransExchangeName, cfg.TransRoutingkey, pubData)
+		if !suc {
+			//重新发送
+			mq.Publish(cfg.TransExchangeName, cfg.TransRoutingkey, pubData)
+		}
 
 		//存储到tree内 => 存入mysql
 		_ = meta.UpdateFileMetaDB(fileMeta)
@@ -241,7 +261,7 @@ func DownloadUrlHandler(w http.ResponseWriter, r *http.Request) {
 	//获取文件信息
 	data, _ := dblayer.GetFileMeta(filehash)
 	//获取下载地址
-	url := oss.DownloadUrl(data.FileAddr)
+	url := oss.DownloadUrl(data.FileAddr.String)
 
 	w.Write([]byte(url))
 	return

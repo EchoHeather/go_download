@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	cfg "goWork/config"
 	"log"
 	"os"
 )
@@ -12,7 +13,7 @@ var db *sql.DB
 
 //init mysql初始化
 func init() {
-	db, _ = sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/fileserver?charset=utf8")
+	db, _ = sql.Open("mysql", cfg.MysqlHost)
 	db.SetMaxOpenConns(1000)
 	err := db.Ping()
 	if err != nil {
