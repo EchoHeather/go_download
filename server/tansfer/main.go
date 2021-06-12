@@ -39,7 +39,7 @@ func ProcessTransfer(msg []byte) bool {
 
 	//更新文件表信息
 	suc := dblayer.UpdateFileLocation(pubDta.FileHash, pubDta.DestLocation)
-	if suc != nil {
+	if !suc {
 		return false
 	}
 
